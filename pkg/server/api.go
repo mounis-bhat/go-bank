@@ -10,13 +10,13 @@ import (
 
 type APIServer struct {
 	listenAddress string
-	store         db.Storage
+	dbConnection  *db.PostgresStorage
 }
 
-func NewAPIServer(listenAddress string, store db.Storage) *APIServer {
+func NewAPIServer(listenAddress string, dbConnection *db.PostgresStorage) *APIServer {
 	return &APIServer{
 		listenAddress: listenAddress,
-		store:         store,
+		dbConnection:  dbConnection,
 	}
 }
 

@@ -20,7 +20,7 @@ func (s *APIServer) handleGetAccount(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Println(validatedAccount.Username)
 
-	account, err := s.store.GetAccountByUsername(validatedAccount.Username)
+	account, err := s.dbConnection.GetAccountByUsername(validatedAccount.Username)
 	if err != nil {
 
 		lib.WriteJSON(w, http.StatusNotFound, "Account not found")
@@ -42,7 +42,7 @@ func (s *APIServer) handleGetAccounts(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	accounts, err := s.store.GetAccounts()
+	accounts, err := s.dbConnection.GetAccounts()
 	if err != nil {
 		fmt.Println(err)
 		lib.WriteJSON(w, http.StatusNotFound, "Account not found")
@@ -59,7 +59,7 @@ func (s *APIServer) handleDeleteAccount(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	if err := s.store.DeleteAccount(validatedAccount.ID); err != nil {
+	if err := s.dbConnection.DeleteAccount(validatedAccount.ID); err != nil {
 		lib.WriteJSON(w, http.StatusNotFound, "Account not found")
 		return
 	}
@@ -93,7 +93,7 @@ func (s *APIServer) handleCreateAccount(w http.ResponseWriter, r *http.Request) 
 
 	account := types.NewAccount(request.FirstName, request.LastName, request.Username, hashedAndSaltedPassword, request.Roles)
 
-	accountID, err := s.store.CreateAccount(account)
+	accountID, err := s.dbConnection.CreateAccount(account)
 	if err != nil {
 		lib.WriteJSON(w, http.StatusInternalServerError, "Internal Server Error create")
 		return
@@ -121,7 +121,7 @@ func (s *APIServer) handleLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	account, err := s.store.GetAccountByUsername(request.Username)
+	account, err := s.dbConnection.GetAccountByUsername(request.Username)
 	if err != nil {
 		lib.WriteJSON(w, http.StatusNotFound, "Access denied")
 		return
@@ -162,7 +162,7 @@ func (s *APIServer) handleUpdateAccount(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	account, err := s.store.GetAccountByUsername(validatedAccount.Username)
+	account, err := s.dbConnection.GetAccountByUsername(validatedAccount.Username)
 	if err != nil {
 		lib.WriteJSON(w, http.StatusNotFound, "Account not found")
 		return
@@ -195,7 +195,7 @@ func (s *APIServer) handleUpdateAccount(w http.ResponseWriter, r *http.Request) 
 	account.LastName = lastName
 	account.Balance = balance
 
-	if err := s.store.UpdateAccount(account); err != nil {
+	if err := s.dbConnection.UpdateAccount(account); err != nil {
 		fmt.Println(err)
 	}
 
@@ -226,7 +226,7 @@ func (s *APIServer) handleTransferMoney(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	if err := s.store.TransferMoney(validatedAccount.ID, request.ToAccountID, request.Amount); err != nil {
+	if err := s.dbConnection.TransferMoney(validatedAccount.ID, request.ToAccountID, request.Amount); err != nil {
 		lib.WriteJSON(w, http.StatusBadRequest, "Cannot transfer money")
 		return
 	}

@@ -16,14 +16,11 @@ func init() {
 }
 
 func main() {
-	store, err := db.NewPostgresStorage()
+	dbConnection, err := db.NewPostgresStorage()
 	if err != nil {
 		log.Fatal(err)
 	}
-	if err := db.InitStorage(store); err != nil {
-		log.Fatal(err)
-	}
 
-	server := server.NewAPIServer(":8080", store)
+	server := server.NewAPIServer(":8080", dbConnection)
 	server.Run()
 }

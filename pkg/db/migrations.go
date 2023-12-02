@@ -1,6 +1,8 @@
 package db
 
-func (s *PostgresStorage) autoMigrate() error {
+import "database/sql"
+
+func autoMigrate(database *sql.DB) error {
 	query := `
 	CREATE TABLE IF NOT EXISTS accounts (
 			account_id SERIAL PRIMARY KEY,
@@ -14,7 +16,6 @@ func (s *PostgresStorage) autoMigrate() error {
 	)
 	`
 
-	_, err := s.db.Exec(query)
-
+	_, err := database.Exec(query)
 	return err
 }
