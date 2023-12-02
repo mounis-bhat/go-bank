@@ -25,15 +25,14 @@ func (s *APIServer) handleGetAccount(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *APIServer) handleGetAccounts(w http.ResponseWriter, r *http.Request) {
-	token := r.Header.Get("Authorization")
-	if token == "" {
+	validatedAccount, err := GetAccountAndValidate(r)
+	if err != nil {
 		WriteJSON(w, http.StatusUnauthorized, "Unauthorized")
 		return
 	}
-	accessToken := strings.Split(token, " ")[1]
-	_, err := ValidateToken(accessToken)
-	if err != nil {
-		WriteJSON(w, http.StatusUnauthorized, "Unauthorized")
+
+	if !strings.Contains(validatedAccount.Roles, "admin") {
+		WriteJSON(w, http.StatusForbidden, "Forbidden")
 		return
 	}
 
@@ -70,6 +69,13 @@ func (s *APIServer) handleCreateAccount(w http.ResponseWriter, r *http.Request) 
 
 	if request.FirstName == "" || request.LastName == "" || request.Username == "" || request.Password == "" || request.Roles == nil {
 		WriteJSON(w, http.StatusBadRequest, "Invalid body")
+		return
+	}
+
+	isValid := IsValidPassword(request.Password)
+
+	if !isValid {
+		WriteJSON(w, http.StatusBadRequest, "The password must be at least 8 characters long, contain at least one uppercase/lowercase letter, at least one number and at least one special character")
 		return
 	}
 

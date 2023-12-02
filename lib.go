@@ -21,6 +21,7 @@ func GenerateJWTToken(account *Account) (string, error) {
 		"balance":    account.Balance,
 		"created_at": account.CreatedAt,
 		"username":   account.Username,
+		"roles":      strings.Join(account.Roles, ","),
 		"iat":        time.Now().Unix(),
 		"exp":        time.Now().Add(time.Hour * 24).Unix(),
 	})
@@ -75,6 +76,7 @@ func GetAccountAndValidate(r *http.Request) (*ValidateAccountRequest, error) {
 		Balance:   int(claims["balance"].(float64)),
 		CreatedAt: claims["created_at"].(string),
 		Username:  claims["username"].(string),
+		Roles:     claims["roles"].(string),
 		IAT:       int(claims["iat"].(float64)),
 		EXP:       int(claims["exp"].(float64)),
 	}
@@ -90,4 +92,28 @@ func HashAndSaltPassword(password string) (string, error) {
 func ComparePasswords(hashedPassword string, password string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
 	return err == nil
+}
+
+func IsValidPassword(password string) bool {
+	if len(password) < 8 {
+		return false
+	}
+
+	if !strings.ContainsAny(password, "ABCDEFGHIJKLMNOPQRSTUVWXYZ") {
+		return false
+	}
+
+	if !strings.ContainsAny(password, "abcdefghijklmnopqrstuvwxyz") {
+		return false
+	}
+
+	if !strings.ContainsAny(password, "0123456789") {
+		return false
+	}
+
+	if !strings.ContainsAny(password, "!@#$%^&*()") {
+		return false
+	}
+
+	return true
 }

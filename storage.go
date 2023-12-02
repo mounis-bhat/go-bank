@@ -96,11 +96,11 @@ func (s *PostgresStorage) CreateAccount(account *Account) (int, error) {
 }
 
 func (s *PostgresStorage) DeleteAccount(id int) error {
-	row := s.db.QueryRow("SELECT * FROM accounts WHERE account_id = $1", id)
+	row := s.db.QueryRow("SELECT account_id FROM accounts WHERE account_id = $1", id)
 
-	account := &Account{}
+	account := &DeleteAccountRequest{}
 
-	if err := row.Scan(&account.ID, &account.FirstName, &account.LastName, &account.Balance, &account.CreatedAt); err != nil {
+	if err := row.Scan(&account.ID); err != nil {
 		return err
 	}
 

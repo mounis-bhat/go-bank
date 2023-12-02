@@ -34,6 +34,7 @@ type ValidateAccountRequest struct {
 	Balance   int    `json:"balance"`
 	CreatedAt string `json:"created_at"`
 	Username  string `json:"username"`
+	Roles     string `json:"roles"`
 	IAT       int    `json:"iat"`
 	EXP       int    `json:"exp"`
 }
@@ -50,6 +51,10 @@ type AccountsRequest struct {
 	CreatedAt string `json:"created_at"`
 	Id        int    `json:"account_id"`
 	Balance   int    `json:"balance"`
+}
+
+type DeleteAccountRequest struct {
+	ID int `json:"account_id"`
 }
 
 type Account struct {
