@@ -1,7 +1,6 @@
-package main
+package lib
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"os"
@@ -9,10 +8,11 @@ import (
 	"time"
 
 	jwt "github.com/golang-jwt/jwt/v5"
+	"github.com/mounis-bhat/go-bank/types"
 	"golang.org/x/crypto/bcrypt"
 )
 
-func GenerateJWTToken(account *Account) (string, error) {
+func GenerateJWTToken(account *types.Account) (string, error) {
 	secret := os.Getenv("JWT_SECRET")
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"account_id": account.ID,
@@ -51,13 +51,7 @@ func ValidateToken(accessToken string) (jwt.MapClaims, error) {
 	return claims, nil
 }
 
-func WriteJSON(w http.ResponseWriter, status int, v any) error {
-	w.Header().Add("Content-Type", "application/json")
-	w.WriteHeader(status)
-	return json.NewEncoder(w).Encode(v)
-}
-
-func GetAccountAndValidate(r *http.Request) (*ValidateAccountRequest, error) {
+func GetAccountAndValidate(r *http.Request) (*types.ValidateAccountRequest, error) {
 	token := r.Header.Get("Authorization")
 	if token == "" {
 		return nil, fmt.Errorf("unauthorized")
@@ -69,7 +63,7 @@ func GetAccountAndValidate(r *http.Request) (*ValidateAccountRequest, error) {
 		return nil, fmt.Errorf("unauthorized")
 	}
 
-	validatedAccount := &ValidateAccountRequest{
+	validatedAccount := &types.ValidateAccountRequest{
 		ID:        int(claims["account_id"].(float64)),
 		FirstName: claims["first_name"].(string),
 		LastName:  claims["last_name"].(string),

@@ -1,6 +1,8 @@
-package main
+package types
 
-import "time"
+import (
+	"time"
+)
 
 type CreateAccountRequest struct {
 	FirstName string   `json:"first_name"`
@@ -66,18 +68,6 @@ type Account struct {
 	Username  string    `json:"username"`
 	Password  string    `json:"password"`
 	Roles     []string  `json:"roles"`
-}
-
-type APIServer struct {
-	listenAddress string
-	store         Storage
-}
-
-func NewAPIServer(listenAddress string, store Storage) *APIServer {
-	return &APIServer{
-		listenAddress: listenAddress,
-		store:         store,
-	}
 }
 
 type APIError struct {

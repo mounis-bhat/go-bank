@@ -1,11 +1,24 @@
-package main
+package server
 
 import (
 	"fmt"
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/mounis-bhat/go-bank/pkg/db"
 )
+
+type APIServer struct {
+	listenAddress string
+	store         db.Storage
+}
+
+func NewAPIServer(listenAddress string, store db.Storage) *APIServer {
+	return &APIServer{
+		listenAddress: listenAddress,
+		store:         store,
+	}
+}
 
 func (s *APIServer) Run() {
 	router := mux.NewRouter()

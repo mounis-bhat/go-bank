@@ -5,6 +5,8 @@ import (
 	"log"
 
 	"github.com/joho/godotenv"
+	"github.com/mounis-bhat/go-bank/pkg/db"
+	"github.com/mounis-bhat/go-bank/pkg/server"
 )
 
 func init() {
@@ -14,14 +16,14 @@ func init() {
 }
 
 func main() {
-	store, err := NewPostgresStorage()
+	store, err := db.NewPostgresStorage()
 	if err != nil {
 		log.Fatal(err)
 	}
-	if err := InitStorage(store); err != nil {
+	if err := db.InitStorage(store); err != nil {
 		log.Fatal(err)
 	}
 
-	server := NewAPIServer(":8080", store)
+	server := server.NewAPIServer(":8080", store)
 	server.Run()
 }

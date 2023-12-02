@@ -1,4 +1,4 @@
-package main
+package db
 
 import (
 	"database/sql"
@@ -6,15 +6,16 @@ import (
 	"os"
 
 	"github.com/lib/pq"
+	"github.com/mounis-bhat/go-bank/types"
 )
 
 type Storage interface {
-	CreateAccount(*Account) (int, error)
+	CreateAccount(*types.Account) (int, error)
 	DeleteAccount(int) error
-	UpdateAccount(*Account) error
-	GetAccounts() ([]*AccountsRequest, error)
+	UpdateAccount(*types.Account) error
+	GetAccounts() ([]*types.AccountsRequest, error)
 	TransferMoney(int, int, int) error
-	GetAccountByUsername(string) (*Account, error)
+	GetAccountByUsername(string) (*types.Account, error)
 }
 
 type PostgresStorage struct {
@@ -57,10 +58,10 @@ func (s *PostgresStorage) createAccountTable() error {
 	return err
 }
 
-func (s *PostgresStorage) GetAccountByUsername(username string) (*Account, error) {
+func (s *PostgresStorage) GetAccountByUsername(username string) (*types.Account, error) {
 	row := s.db.QueryRow("SELECT * FROM accounts WHERE username = $1", username)
 
-	account := &Account{}
+	account := &types.Account{}
 
 	if err := row.Scan(&account.ID, &account.FirstName, &account.LastName, &account.Balance, &account.CreatedAt, &account.Username, &account.Password, pq.Array(&account.Roles)); err != nil {
 		return nil, err
@@ -69,7 +70,7 @@ func (s *PostgresStorage) GetAccountByUsername(username string) (*Account, error
 	return account, nil
 }
 
-func (s *PostgresStorage) CreateAccount(account *Account) (int, error) {
+func (s *PostgresStorage) CreateAccount(account *types.Account) (int, error) {
 	query := `
 	INSERT INTO accounts (
 			first_name,
@@ -98,7 +99,7 @@ func (s *PostgresStorage) CreateAccount(account *Account) (int, error) {
 func (s *PostgresStorage) DeleteAccount(id int) error {
 	row := s.db.QueryRow("SELECT account_id FROM accounts WHERE account_id = $1", id)
 
-	account := &DeleteAccountRequest{}
+	account := &types.DeleteAccountRequest{}
 
 	if err := row.Scan(&account.ID); err != nil {
 		return err
@@ -109,7 +110,7 @@ func (s *PostgresStorage) DeleteAccount(id int) error {
 	return err
 }
 
-func (s *PostgresStorage) UpdateAccount(account *Account) error {
+func (s *PostgresStorage) UpdateAccount(account *types.Account) error {
 	query := `
 	UPDATE 
 		accounts 
@@ -126,7 +127,7 @@ func (s *PostgresStorage) UpdateAccount(account *Account) error {
 	return err
 }
 
-func (s *PostgresStorage) GetAccounts() ([]*AccountsRequest, error) {
+func (s *PostgresStorage) GetAccounts() ([]*types.AccountsRequest, error) {
 	query := `
 	SELECT
 		first_name,
@@ -144,10 +145,10 @@ func (s *PostgresStorage) GetAccounts() ([]*AccountsRequest, error) {
 	}
 	defer rows.Close()
 
-	accounts := make([]*AccountsRequest, 0)
+	accounts := make([]*types.AccountsRequest, 0)
 
 	for rows.Next() {
-		account := &AccountsRequest{}
+		account := &types.AccountsRequest{}
 		if err := rows.Scan(&account.FirstName, &account.LastName, &account.Username, &account.CreatedAt, &account.Id, &account.Balance); err != nil {
 			return nil, err
 		}
