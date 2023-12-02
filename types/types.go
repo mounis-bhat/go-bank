@@ -69,7 +69,3 @@ type Account struct {
 	Password  string    `json:"password"`
 	Roles     []string  `json:"roles"`
 }
-
-type APIError struct {
-	Error string `json:"error"`
-}

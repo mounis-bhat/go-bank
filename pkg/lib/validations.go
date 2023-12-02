@@ -8,6 +8,7 @@ import (
 	"time"
 
 	jwt "github.com/golang-jwt/jwt/v5"
+
 	"github.com/mounis-bhat/go-bank/types"
 	"golang.org/x/crypto/bcrypt"
 )
